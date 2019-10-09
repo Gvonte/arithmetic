@@ -14,7 +14,6 @@
             </template>
         </el-table-column>
     </el-table>
-    <el-button type="primary" round class="btn" @click="clickSubmit">提交</el-button>
     <el-dialog :visible.sync="dialogVisible" width="600px" custom-class="dialog" top="25vh" :show-close="false">
         <p>Correct: {{correctAmount}} ({{correctAry.toString()}})</p>
         <p>Wrong: {{wrongAmount}} ({{wrongAry.toString()}})</p>
@@ -23,6 +22,7 @@
             <el-button type="info" @click="answerFlag = false"  class="hide">隐藏答案</el-button>
         </span>
     </el-dialog>
+    <el-button type="primary" round class="btn" @click="clickSubmit">提交</el-button>
     <el-button type="success" round class="btn" @click="clickSave">保存答案至本地</el-button>
     <el-button type="info" round class="btn" @click="clickUploadExercise">上传题目文件</el-button>
     <el-button type="info" round class="btn" @click="clickUploadUserAnswer">上传你的答案</el-button>
@@ -429,7 +429,7 @@ export default {
     width: 600px;
 }
 .about .btn{
-    margin-top: 20px;
+    margin: 20px 0 0 0;
     width: 600px;
 }
 .about .dialog p{
@@ -446,8 +446,5 @@ export default {
 }
 .about .dialog .dialog-footer .hide{
     width: 150px;
-}
-.about .upload{
-    width: 600px;
 }
 </style>
