@@ -97,21 +97,26 @@ export default {
         },
         //随机生成一个数（自然数或真分数）
         createNumber(){
-            let num = Math.floor(Math.random()*(this.exerciseNumberSize)+1)
+            let num = Math.floor(Math.random()*this.exerciseNumberSize+1)
+            let str = null
             if (num===this.exerciseNumberSize) {
-                //生成真分数
+                //生成真分数     
                 let down = Math.floor(Math.random()*(this.exerciseNumberSize-2)+2)
                 let up = Math.floor(Math.random()*(down-1)+1)
-                return `${up}/${down}`
+                let interget = Math.floor(Math.random()*(this.exerciseNumberSize-1)+1)
+                str = Math.random()-0.5>0 ? `${interget}\'${up}/${down}`:`${up}/${down}`
             } else {
                 //生成自然数
-                return '' + num
+                str = '' + num
             }
+            let test = this.formatAnswer(str)
+            return test
+            // return this.formatAnswer(str)
         },
         //判断该字符串是一个数还是一个算式（0：自然数，1：分数，2：算式）
         isNumber(str){
             if (!isNaN(str)) return 0
-            if (/^\d+\/\d+$/.test(str)) return 1
+            if (/^(\d+')?\d+\/\d+$/.test(str)) return 1
             return 2
         },
         //基本运算（加减乘除以及真分数的运算），返回false（运算产生负数导致false）或运算结果
@@ -137,8 +142,15 @@ export default {
             if (this.isNumber(num1)===0 && this.isNumber(num2)===1) {
                 //自然数与真分数的运算
                 num1 = Number(num1)
-                let up = Number(num2.split('/')[0])
-                let down = Number(num2.split('/')[1])
+                let up = null
+                let down = null
+                if(num2.indexOf("'")>-1){
+                    down = Number(num2.split('/')[1])
+                    up = num2.split('/')[0].split("'")[0] * down + Number(num2.split('/')[0].split("'")[1])
+                } else {
+                    up = Number(num2.split('/')[0])
+                    down = Number(num2.split('/')[1])
+                }
                 switch(character){
                     case '+':
                         return `${num1*down+up}/${down}`
@@ -152,8 +164,15 @@ export default {
             }
             if (this.isNumber(num1)===1 && this.isNumber(num2)===0) {
                 //真分数与自然数的运算
-                let up = Number(num1.split('/')[0])
-                let down = Number(num1.split('/')[1])
+                let up = null
+                let down = null
+                if(num1.indexOf("'")>-1){
+                    down = Number(num1.split('/')[1])
+                    up = num1.split('/')[0].split("'")[0] * down + Number(num1.split('/')[0].split("'")[1])
+                } else {
+                    up = Number(num1.split('/')[0])
+                    down = Number(num1.split('/')[1])
+                }
                 num2 = Number(num2)
                 switch(character){
                     case '+':
@@ -168,10 +187,24 @@ export default {
             }
             if (this.isNumber(num1)===1 && this.isNumber(num2)===1) {
                 //真分数与真分数的运算
-                let up1 = Number(num1.split('/')[0])
-                let down1 = Number(num1.split('/')[1])
-                let up2 = Number(num2.split('/')[0])
-                let down2 = Number(num2.split('/')[1])
+                let up1 = null
+                let down1 = null
+                let up2 = null
+                let down2 = null
+                if(num1.indexOf("'")>-1){
+                    down1 = Number(num1.split('/')[1])
+                    up1 = num1.split('/')[0].split("'")[0] * down1 + Number(num1.split('/')[0].split("'")[1])
+                } else {
+                    up1 = Number(num1.split('/')[0])
+                    down1 = Number(num1.split('/')[1])
+                }
+                if(num2.indexOf("'")>-1){
+                    down2 = Number(num2.split('/')[1])
+                    up2 = num2.split('/')[0].split("'")[0] * down2 + Number(num2.split('/')[0].split("'")[1])
+                } else {
+                    up2 = Number(num2.split('/')[0])
+                    down2 = Number(num2.split('/')[1])
+                }
                 switch(character){
                     case '+':
                         return `${up1*down2+up2*down1}/${down1*down2}`
@@ -192,7 +225,7 @@ export default {
             while(flag && this.isNumber(str)===2) {
                 if (str.indexOf("×")>-1 || str.indexOf("÷")>-1) {
                     //有乘除运算，先算乘除
-                    str = str.replace(/(\d+)?(\d+\/\d+)?[×|÷](\d+\/\d+)?(\d+)?/, (...arg)=>{
+                    str = str.replace(/(\d+)?((\d+')?\d+\/\d+)?[×|÷]((\d+')?\d+\/\d+)?(\d+)?/, (...arg)=>{
                         let res = this.compute(arg[0])
                         if(res===false) {
                             flag = false
@@ -204,7 +237,7 @@ export default {
                     })    
                 } else {
                     //没乘除运算，算加减
-                    str = str.replace(/(\d+)?(\d+\/\d+)?[+|-](\d+\/\d+)?(\d+)?/, (...arg)=>{
+                    str = str.replace(/(\d+)?((\d+')?\d+\/\d+)?[+|-]((\d+')?\d+\/\d+)?(\d+)?/, (...arg)=>{
                         let res = this.compute(arg[0])
                         if(res===false) {
                             flag = false
@@ -267,8 +300,15 @@ export default {
         //格式化答案
         formatAnswer(str){
             if (this.isNumber(str)===1) {
-                let up = Number(str.split('/')[0])
-                let down = Number(str.split('/')[1])
+                let up = null
+                let down = null
+                if(str.indexOf("'")>-1){
+                    down = Number(str.split('/')[1])
+                    up = str.split('/')[0].split("'")[0] * down + Number(str.split('/')[0].split("'")[1])
+                } else {
+                    up = Number(str.split('/')[0])
+                    down = Number(str.split('/')[1])
+                }
                 if (up>down) {
                     let mcd = this.maxCommonDivisor(up, down)
                     up = up/mcd
@@ -416,7 +456,6 @@ export default {
                         _this.exerciseAry[index].userAnswer = item.trim()
                     }
                 })
-                console.log(_this.exerciseAry)
             }
         }
     }
